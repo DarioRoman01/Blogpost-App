@@ -43,6 +43,7 @@ func main() {
 	e.GET("/posts/:id", ph.GetPost)
 	e.GET("/posts", ph.ListPosts)
 	e.DELETE("/posts/:id", ph.RemovePost, middlewares.IsPostOwner)
+	e.PATCH("/posts/:id", ph.PostUpdate, middlewares.IsPostOwner)
 
 	// users endpoints
 	e.POST("/users/signup", uh.Signup)

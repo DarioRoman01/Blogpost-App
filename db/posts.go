@@ -3,6 +3,8 @@ package db
 import (
 	"contacts/models"
 	"context"
+	"encoding/json"
+	"io"
 
 	"github.com/labstack/echo/v4"
 	"go.mongodb.org/mongo-driver/bson"
@@ -28,7 +30,7 @@ func FindPost(ctx context.Context, id string, collection CollectionAPI) (models.
 
 	docID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return post, echo.NewHTTPError(500, "Unable to convert to object id")
+		return post, echo.NewHTTPError(400, "Unable to convert to object id")
 	}
 
 	result := collection.FindOne(ctx, bson.M{"_id": docID})
@@ -45,7 +47,7 @@ func FindPosts(ctx context.Context, follows []string, collection CollectionAPI) 
 
 	cursor, err := collection.Find(ctx, bson.M{"from": bson.M{"$in": follows}})
 	if err != nil {
-		return posts, echo.NewHTTPError(500, "Unable to find posts")
+		return posts, echo.NewHTTPError(404, "Unable to find posts")
 	}
 
 	if err = cursor.All(ctx, &posts); err != nil {
@@ -59,7 +61,7 @@ func FindPosts(ctx context.Context, follows []string, collection CollectionAPI) 
 func DeletePost(ctx context.Context, id string, collection CollectionAPI) (*mongo.DeleteResult, *echo.HTTPError) {
 	docID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return nil, echo.NewHTTPError(500, "Unable to convert to object id")
+		return nil, echo.NewHTTPError(400, "Unable to convert to object id")
 	}
 
 	result, err := collection.DeleteOne(context.Background(), bson.M{"_id": docID})
@@ -68,8 +70,33 @@ func DeletePost(ctx context.Context, id string, collection CollectionAPI) (*mong
 	}
 
 	if result.DeletedCount == 0 {
-		return nil, echo.NewHTTPError(400, "Post id does not exist")
+		return nil, echo.NewHTTPError(404, "Post id does not exist")
 	}
 
 	return result, nil
+}
+
+func UpdatePost(ctx context.Context, id string, reqBody io.ReadCloser, collection CollectionAPI) (models.Post, *echo.HTTPError) {
+	var post models.Post
+
+	docID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return post, echo.NewHTTPError(400, "Unable to convert to object id")
+	}
+	filter := bson.M{"_id": docID}
+	result := collection.FindOne(ctx, filter)
+
+	if err = result.Decode(&post); err != nil {
+		return post, echo.NewHTTPError(404, "Post not found")
+	}
+
+	if err := json.NewDecoder(reqBody).Decode(&post); err != nil {
+		return post, echo.NewHTTPError(422, "Unable to parse request payload")
+	}
+
+	if _, err = collection.UpdateOne(ctx, filter, bson.M{"$set": post}); err != nil {
+		return post, echo.NewHTTPError(500, "Unable to update post")
+	}
+
+	return post, nil
 }

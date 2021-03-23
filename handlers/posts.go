@@ -87,3 +87,12 @@ func (p *PostsHandler) RemovePost(c echo.Context) error {
 
 	return c.JSON(200, delIDS)
 }
+
+func (p *PostsHandler) PostUpdate(c echo.Context) error {
+	post, httpErr := db.UpdatePost(context.Background(), c.Param("id"), c.Request().Body, p.Col)
+	if httpErr != nil {
+		return c.JSON(httpErr.Code, httpErr.Message)
+	}
+
+	return c.JSON(200, post)
+}
