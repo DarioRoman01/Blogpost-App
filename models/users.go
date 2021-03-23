@@ -12,6 +12,7 @@ import (
 
 var cfg config.Properties
 
+// User definition
 type User struct {
 	ID        primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
 	Username  string             `json:"username" bson:"username" validate:"required,min=3"`
@@ -21,6 +22,7 @@ type User struct {
 	Following []string           `json:"following,omitempty" bson:"following,omitempty"`
 }
 
+// util to function to generate token for requesting user
 func (u User) GenerateToken() (string, *echo.HTTPError) {
 	if err := cleanenv.ReadEnv(&cfg); err != nil {
 		panic("Cannot read configuration")

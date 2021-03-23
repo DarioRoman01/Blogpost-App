@@ -9,10 +9,12 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// User handler definition
 type UsersHandler struct {
 	Col db.CollectionAPI
 }
 
+// Handle users signup and validate request body
 func (u *UsersHandler) Signup(c echo.Context) error {
 	var user models.User
 	c.Echo().Validator = &UsersValidator{validator: v}
@@ -33,6 +35,7 @@ func (u *UsersHandler) Signup(c echo.Context) error {
 	return c.JSON(201, result)
 }
 
+// Handle users login and generate JWT token
 func (u *UsersHandler) Login(c echo.Context) error {
 	var user models.User
 
@@ -54,6 +57,7 @@ func (u *UsersHandler) Login(c echo.Context) error {
 	return c.JSON(200, models.User{Username: logUser.Username})
 }
 
+// Handle retrieve user info. Only return the email
 func (u *UsersHandler) GetUser(c echo.Context) error {
 	user, httpErr := db.RetrieveUser(context.Background(), c.Param("id"), u.Col)
 	if httpErr != nil {
@@ -63,6 +67,7 @@ func (u *UsersHandler) GetUser(c echo.Context) error {
 	return c.JSON(200, user)
 }
 
+// Handle following users
 func (u *UsersHandler) FollowUser(c echo.Context) error {
 	toID := c.Param("id")
 	fromID := userIDFromToken(c)
@@ -74,6 +79,7 @@ func (u *UsersHandler) FollowUser(c echo.Context) error {
 	return c.JSON(200, "User followed successfuly")
 }
 
+// Get user id from token
 func userIDFromToken(c echo.Context) string {
 	_, claims := middlewares.GetToken(c)
 	return claims["user_id"].(string)

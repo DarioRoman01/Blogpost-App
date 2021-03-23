@@ -17,6 +17,7 @@ import (
 
 var cfg config.Properties
 
+// init read configuration settings
 func init() {
 	if err := cleanenv.ReadEnv(&cfg); err != nil {
 		panic("Unable to read configuration")
@@ -24,6 +25,7 @@ func init() {
 
 }
 
+// Help to create logs of the request
 func LoggerMiddleware() echo.MiddlewareFunc {
 	logger := middleware.LoggerWithConfig(middleware.LoggerConfig{
 		Format: `${time_rfc3339_nano} ${host} ${method} ${status} ${uri} ${user_agent}` +
@@ -33,6 +35,7 @@ func LoggerMiddleware() echo.MiddlewareFunc {
 	return logger
 }
 
+// check for tokens in all enpoints except the defines in the Skipper
 func JwtMiddleware() echo.MiddlewareFunc {
 	jwtMidd := middleware.JWTWithConfig(middleware.JWTConfig{
 		SigningKey:  []byte(cfg.JwtTokenSecret),
@@ -48,6 +51,7 @@ func JwtMiddleware() echo.MiddlewareFunc {
 	return jwtMidd
 }
 
+// Check if requesting user is owner of the post
 func IsPostOwner(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var post models.Post
@@ -76,6 +80,7 @@ func IsPostOwner(next echo.HandlerFunc) echo.HandlerFunc {
 
 }
 
+// Get token from headers
 func GetToken(c echo.Context) (*jwt.Token, jwt.MapClaims) {
 	headerToken := c.Request().Header.Get("x-auth-token")
 	strToken := strings.Split(headerToken, " ")[1]

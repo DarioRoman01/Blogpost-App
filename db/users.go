@@ -11,6 +11,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// Handle users creation in the db
 func CreateUser(ctx context.Context, user models.User, collection CollectionAPI) (*mongo.InsertOneResult, *echo.HTTPError) {
 	var newUser models.User
 
@@ -40,6 +41,7 @@ func CreateUser(ctx context.Context, user models.User, collection CollectionAPI)
 	return res, nil
 }
 
+// Handle users login and check credentials
 func LoginUser(ctx context.Context, reqUser models.User, collection CollectionAPI) (models.User, *echo.HTTPError) {
 	var user models.User
 
@@ -60,6 +62,7 @@ func LoginUser(ctx context.Context, reqUser models.User, collection CollectionAP
 	return user, nil
 }
 
+// check if the given password is correct
 func isValidCredential(givenPWD, storePWD string) bool {
 	if err := bcrypt.CompareHashAndPassword([]byte(storePWD), []byte(givenPWD)); err != nil {
 		return false
@@ -68,6 +71,7 @@ func isValidCredential(givenPWD, storePWD string) bool {
 	return true
 }
 
+// get user by id
 func RetrieveUser(ctx context.Context, id string, collection CollectionAPI) (models.User, *echo.HTTPError) {
 	var user models.User
 
@@ -84,6 +88,7 @@ func RetrieveUser(ctx context.Context, id string, collection CollectionAPI) (mod
 	return models.User{Username: user.Username}, nil
 }
 
+// Manage the following system in the db fromID(requesting user) toID(users that requesting user want to follow)
 func SetFollowUser(ctx context.Context, fromID string, toID string, collection CollectionAPI) *echo.HTTPError {
 	fromDocID, err := primitive.ObjectIDFromHex(fromID)
 	if err != nil {

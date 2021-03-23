@@ -20,6 +20,7 @@ type CollectionAPI interface {
 	DeleteOne(ctx context.Context, filter interface{}, opts ...*options.DeleteOptions) (*mongo.DeleteResult, error)
 }
 
+// Get connection to the db and retrieve users and posts collections
 func GetConnection() (*mongo.Collection, *mongo.Collection) {
 	var cfg config.Properties
 	if err := cleanenv.ReadEnv(&cfg); err != nil {

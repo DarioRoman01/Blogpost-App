@@ -8,6 +8,7 @@ type UsersValidator struct {
 	validator *validator.Validate
 }
 
+// Validate users definition
 func (u *UsersValidator) Validate(i interface{}) error {
 	return u.validator.Struct(i)
 }
@@ -16,6 +17,7 @@ type PostsValidator struct {
 	validator *validator.Validate
 }
 
+// Validate Posts definition
 func (p *PostsValidator) Validate(i interface{}) error {
 	return p.validator.Struct(i)
 }

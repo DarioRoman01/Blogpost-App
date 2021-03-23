@@ -1,5 +1,6 @@
 package config
 
+// set config properties by env variables
 type Properties struct {
 	Port            string `env:"MY_APP_PORT" env-default:"1323"`
 	Host            string `env:"HOST" env-default:"localhost"`

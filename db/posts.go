@@ -55,6 +55,7 @@ func FindPosts(ctx context.Context, follows []string, collection CollectionAPI) 
 	return posts, nil
 }
 
+// Delete post from the db
 func DeletePost(ctx context.Context, id string, collection CollectionAPI) (*mongo.DeleteResult, *echo.HTTPError) {
 	docID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {

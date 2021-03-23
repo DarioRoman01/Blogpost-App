@@ -10,10 +10,12 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// Post handler definition
 type PostsHandler struct {
 	Col db.CollectionAPI
 }
 
+// Handle requesting data and validation for posts creation
 func (p *PostsHandler) CreatePost(c echo.Context) error {
 	id, err := primitive.ObjectIDFromHex(userIDFromToken(c))
 	if err != nil {
@@ -41,6 +43,7 @@ func (p *PostsHandler) CreatePost(c echo.Context) error {
 	return c.JSON(201, result)
 }
 
+// retrieve one post
 func (p *PostsHandler) GetPost(c echo.Context) error {
 	post, httpErr := db.FindPost(context.Background(), c.Param("id"), p.Col)
 	if httpErr != nil {
@@ -50,6 +53,7 @@ func (p *PostsHandler) GetPost(c echo.Context) error {
 	return c.JSON(200, post)
 }
 
+// list posts based on users that requesting user is following
 func (p *PostsHandler) ListPosts(c echo.Context) error {
 	var user models.User
 	id := userIDFromToken(c)
@@ -74,6 +78,7 @@ func (p *PostsHandler) ListPosts(c echo.Context) error {
 	return c.JSON(200, res)
 }
 
+// handle delete product request
 func (p *PostsHandler) RemovePost(c echo.Context) error {
 	delIDS, httpErr := db.DeletePost(context.Background(), c.Param("id"), p.Col)
 	if httpErr != nil {
