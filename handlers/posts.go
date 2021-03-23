@@ -96,3 +96,41 @@ func (p *PostsHandler) PostUpdate(c echo.Context) error {
 
 	return c.JSON(200, post)
 }
+
+func (p *PostsHandler) CommentPost(c echo.Context) error {
+	id, err := primitive.ObjectIDFromHex(userIDFromToken(c))
+	if err != nil {
+		return c.JSON(500, "Unable to convert to object id")
+	}
+
+	c.Echo().Validator = &CommentValidator{validator: v}
+	var comment models.Comment
+	comment.From = id.Hex()
+
+	if err = c.Bind(&comment); err != nil {
+		return c.JSON(422, "Unable to parse request body")
+	}
+
+	if err = c.Validate(&comment); err != nil {
+		return c.JSON(400, "Invalid request body")
+	}
+
+	result, httpErr := db.CreateComment(context.Background(), c.Param("id"), comment, p.Col)
+	if httpErr != nil {
+		return c.JSON(httpErr.Code, httpErr.Message)
+	}
+
+	return c.JSON(201, result)
+}
+
+func (p *PostsHandler) DeleteComment(c echo.Context) error {
+	postID := c.Param("id")
+	commentID := c.Param("cid")
+
+	post, err := db.RemoveComment(context.Background(), postID, commentID, p.Col)
+	if err != nil {
+		return c.JSON(err.Code, err.Message)
+	}
+
+	return c.JSON(200, post)
+}

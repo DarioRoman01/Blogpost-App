@@ -21,3 +21,11 @@ type PostsValidator struct {
 func (p *PostsValidator) Validate(i interface{}) error {
 	return p.validator.Struct(i)
 }
+
+type CommentValidator struct {
+	validator *validator.Validate
+}
+
+func (c *CommentValidator) Validate(i interface{}) error {
+	return c.validator.Struct(i)
+}

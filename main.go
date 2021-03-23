@@ -44,6 +44,8 @@ func main() {
 	e.GET("/posts", ph.ListPosts)
 	e.DELETE("/posts/:id", ph.RemovePost, middlewares.IsPostOwner)
 	e.PATCH("/posts/:id", ph.PostUpdate, middlewares.IsPostOwner)
+	e.POST("/posts/:id/comment", ph.CommentPost)
+	e.DELETE("/posts/:id/comment/:cid", ph.DeleteComment)
 
 	// users endpoints
 	e.POST("/users/signup", uh.Signup)
