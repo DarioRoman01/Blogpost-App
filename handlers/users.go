@@ -7,6 +7,7 @@ import (
 	"context"
 
 	"github.com/labstack/echo/v4"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // User handler definition
@@ -65,6 +66,30 @@ func (u *UsersHandler) GetUser(c echo.Context) error {
 	}
 
 	return c.JSON(200, user)
+}
+
+// Get users followers
+func (u *UsersHandler) GetFollowers(c echo.Context) error {
+	id, err := primitive.ObjectIDFromHex(c.Param("id"))
+	if err != nil {
+		return c.JSON(500, "Unable to convert to object id")
+	}
+
+	users, httpErr := db.GetUserFollowers(context.Background(), id, u.Col)
+	if httpErr != nil {
+		return c.JSON(httpErr.Code, httpErr.Message)
+	}
+
+	return c.JSON(200, users)
+}
+
+func (u *UsersHandler) GetUserPosts(c echo.Context) error {
+	posts, httpErr := db.RetrievetUserPosts(context.Background(), c.Param("id"), u.Col)
+	if httpErr != nil {
+		return c.JSON(httpErr.Code, httpErr.Message)
+	}
+
+	return c.JSON(200, posts)
 }
 
 // Handle following users

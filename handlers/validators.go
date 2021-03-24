@@ -26,6 +26,7 @@ type CommentValidator struct {
 	validator *validator.Validate
 }
 
+// validate Comment definition
 func (c *CommentValidator) Validate(i interface{}) error {
 	return c.validator.Struct(i)
 }

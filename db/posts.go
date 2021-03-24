@@ -100,3 +100,18 @@ func UpdatePost(ctx context.Context, id string, reqBody io.ReadCloser, collectio
 
 	return post, nil
 }
+
+func RetrievetUserPosts(ctx context.Context, id string, collection CollectionAPI) ([]models.Post, *echo.HTTPError) {
+	var posts []models.Post
+
+	cursor, err := collection.Find(ctx, bson.M{"from": id})
+	if err != nil {
+		return nil, echo.NewHTTPError(404, "Unable to find posts")
+	}
+
+	if err = cursor.All(ctx, &posts); err != nil {
+		return nil, echo.NewHTTPError(500, "Unable to decode retrieved posts")
+	}
+
+	return posts, nil
+}

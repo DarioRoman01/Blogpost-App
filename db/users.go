@@ -116,3 +116,34 @@ func SetFollowUser(ctx context.Context, fromID string, toID string, collection C
 
 	return nil
 }
+
+// Retrieve all followers of the user
+func GetUserFollowers(ctx context.Context, id primitive.ObjectID, collection CollectionAPI) ([]models.User, *echo.HTTPError) {
+	var followers []primitive.ObjectID
+	var users []models.User
+	var user models.User
+
+	result := collection.FindOne(ctx, bson.M{"_id": id})
+	if err := result.Decode(&user); err != nil {
+		return nil, echo.NewHTTPError(500, "Unable to decode retrieved user")
+	}
+
+	for _, userId := range user.Followers {
+		docID, err := primitive.ObjectIDFromHex(userId)
+		if err != nil {
+			return nil, echo.NewHTTPError(500, "Unable to convert to object id")
+		}
+		followers = append(followers, docID)
+	}
+
+	cursor, err := collection.Find(ctx, bson.M{"_id": bson.M{"$in": followers}})
+	if err != nil {
+		return nil, echo.NewHTTPError(404, "Unable to find users")
+	}
+
+	if err = cursor.All(ctx, &users); err != nil {
+		return nil, echo.NewHTTPError(500, "Unable to parse retrieved users")
+	}
+
+	return users, nil
+}

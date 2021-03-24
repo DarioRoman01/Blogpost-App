@@ -45,12 +45,14 @@ func main() {
 	e.DELETE("/posts/:id", ph.RemovePost, middlewares.IsPostOwner)
 	e.PATCH("/posts/:id", ph.PostUpdate, middlewares.IsPostOwner)
 	e.POST("/posts/:id/comment", ph.CommentPost)
-	e.DELETE("/posts/:id/comment/:cid", ph.DeleteComment)
+	e.DELETE("/posts/:id/comment/:cid", ph.DeleteComment, middlewares.IsCommentOwner)
 
 	// users endpoints
 	e.POST("/users/signup", uh.Signup)
 	e.POST("/users/login", uh.Login)
 	e.GET("/users/:id", uh.GetUser)
+	e.GET("users/:id/posts", uh.GetUserPosts)
+	e.GET("/users/:id/followers", uh.GetFollowers)
 	e.POST("/users/:id/follow", uh.FollowUser)
 
 	// initializer server

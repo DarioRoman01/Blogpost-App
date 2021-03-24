@@ -80,6 +80,42 @@ func IsPostOwner(next echo.HandlerFunc) echo.HandlerFunc {
 
 }
 
+// Check if requesting user is owner of the comment
+func IsCommentOwner(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var post models.Post
+
+		postID, err := primitive.ObjectIDFromHex(c.Param("id"))
+		if err != nil {
+			return echo.NewHTTPError(500, "Unable to convert to object id")
+		}
+
+		commentID, err := primitive.ObjectIDFromHex(c.Param("cid"))
+		if err != nil {
+			return echo.NewHTTPError(500, "Unable to convert to object id")
+		}
+		ctx := context.Background()
+		_, postColl := db.GetConnection()
+		defer postColl.Database().Client().Disconnect(ctx)
+
+		result := postColl.FindOne(ctx, bson.M{"_id": postID})
+		if err = result.Decode(&post); err != nil {
+			return echo.NewHTTPError(422, "Unable to parse retrieved post")
+		}
+
+		_, claims := GetToken(c)
+
+		for _, comment := range post.Comments {
+			if comment.ID == commentID {
+				if comment.From != claims["user_id"] {
+					return echo.NewHTTPError(403, "You do not have permissions to perform this action")
+				}
+			}
+		}
+		return next(c)
+	}
+}
+
 // Get token from headers
 func GetToken(c echo.Context) (*jwt.Token, jwt.MapClaims) {
 	headerToken := c.Request().Header.Get("x-auth-token")

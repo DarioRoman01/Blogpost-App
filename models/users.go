@@ -22,7 +22,7 @@ type User struct {
 	Following []string           `json:"following,omitempty" bson:"following,omitempty"`
 }
 
-// util to function to generate token for requesting user
+// util function to generate token for requesting user
 func (u User) GenerateToken() (string, *echo.HTTPError) {
 	if err := cleanenv.ReadEnv(&cfg); err != nil {
 		panic("Cannot read configuration")

@@ -12,6 +12,7 @@ type Post struct {
 	Comments []Comment          `json:"comments" bson:"comments"`
 }
 
+// Comment definition
 type Comment struct {
 	ID      primitive.ObjectID `json:"id,omitempty" bson:"_id"`
 	From    string             `json:"from" bson:"from"`

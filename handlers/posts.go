@@ -88,6 +88,7 @@ func (p *PostsHandler) RemovePost(c echo.Context) error {
 	return c.JSON(200, delIDS)
 }
 
+// Handle post update request
 func (p *PostsHandler) PostUpdate(c echo.Context) error {
 	post, httpErr := db.UpdatePost(context.Background(), c.Param("id"), c.Request().Body, p.Col)
 	if httpErr != nil {
@@ -97,6 +98,7 @@ func (p *PostsHandler) PostUpdate(c echo.Context) error {
 	return c.JSON(200, post)
 }
 
+// Handle validation and parsing request data for comments creation
 func (p *PostsHandler) CommentPost(c echo.Context) error {
 	id, err := primitive.ObjectIDFromHex(userIDFromToken(c))
 	if err != nil {
@@ -123,6 +125,7 @@ func (p *PostsHandler) CommentPost(c echo.Context) error {
 	return c.JSON(201, result)
 }
 
+// Handle delete comment request
 func (p *PostsHandler) DeleteComment(c echo.Context) error {
 	postID := c.Param("id")
 	commentID := c.Param("cid")

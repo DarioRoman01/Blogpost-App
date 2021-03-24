@@ -9,6 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// Handle comments creation in the db
 func CreateComment(ctx context.Context, id string, comment models.Comment, collection CollectionAPI) (models.Post, *echo.HTTPError) {
 	var post models.Post
 	docID, err := primitive.ObjectIDFromHex(id)
@@ -36,6 +37,7 @@ func CreateComment(ctx context.Context, id string, comment models.Comment, colle
 	return post, nil
 }
 
+// Handle Delete comments from the db
 func RemoveComment(ctx context.Context, postID string, commentID string, collection CollectionAPI) (models.Post, *echo.HTTPError) {
 	var post models.Post
 
@@ -55,8 +57,8 @@ func RemoveComment(ctx context.Context, postID string, commentID string, collect
 		return post, echo.NewHTTPError(500, "Unable to decode retrieved post")
 	}
 
-	for i, val := range post.Comments {
-		if val.ID == commetDocID {
+	for i, comment := range post.Comments {
+		if comment.ID == commetDocID {
 			post.Comments = append(post.Comments[:i], post.Comments[i+1:]...)
 			break
 		}
