@@ -24,7 +24,7 @@ way to learn MongoDB than using it in a project.
 ## Requirements 
 * Docker and Docker-compose
 
-## Usage
+## Commands
 ```
 $ export COMPOSE_FILE=docker-compose.yml
 

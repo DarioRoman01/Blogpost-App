@@ -76,6 +76,7 @@ func DeletePost(ctx context.Context, id string, collection CollectionAPI) (*mong
 	return result, nil
 }
 
+// Handle update post data
 func UpdatePost(ctx context.Context, id string, reqBody io.ReadCloser, collection CollectionAPI) (models.Post, *echo.HTTPError) {
 	var post models.Post
 
@@ -101,6 +102,7 @@ func UpdatePost(ctx context.Context, id string, reqBody io.ReadCloser, collectio
 	return post, nil
 }
 
+// Retrieve all posts from one user
 func RetrievetUserPosts(ctx context.Context, id string, collection CollectionAPI) ([]models.Post, *echo.HTTPError) {
 	var posts []models.Post
 

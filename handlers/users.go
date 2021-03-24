@@ -83,6 +83,7 @@ func (u *UsersHandler) GetFollowers(c echo.Context) error {
 	return c.JSON(200, users)
 }
 
+// Retrieve the posts from user by id
 func (u *UsersHandler) GetUserPosts(c echo.Context) error {
 	posts, httpErr := db.RetrievetUserPosts(context.Background(), c.Param("id"), u.Col)
 	if httpErr != nil {
