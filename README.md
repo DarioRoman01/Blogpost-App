@@ -2,6 +2,8 @@
 a sample REST API for a blogpost application using Golang with Echo framework
 and MongoDB to store the data.
 
+![](https://github.com/Haizza1/my_first_repo/blob/master/golang.png)
+
 ## What is this Project?
 this is a backend for a blogpost app. The users has all the CRUD operations with hers posts,
 follow others users and comment the posts. Im currently develop a chat service app
