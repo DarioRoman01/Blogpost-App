@@ -62,15 +62,17 @@ func (p *PostsHandler) ListPosts(c echo.Context) error {
 		return c.JSON(500, "Unable to converto to object id")
 	}
 
+	ctx := context.Background()
+
 	usersColl, _ := db.GetConnection()
-	result := usersColl.FindOne(context.Background(), bson.M{"_id": docID})
+	result := usersColl.FindOne(ctx, bson.M{"_id": docID})
 	if err := result.Decode(&user); err != nil {
 		return c.JSON(500, "Something wrong happend in the request")
 	}
 
-	defer usersColl.Database().Client().Disconnect(context.Background())
+	defer usersColl.Database().Client().Disconnect(ctx)
 	user.Following = append(user.Following, id)
-	res, httpErr := db.FindPosts(context.Background(), user.Following, p.Col)
+	res, httpErr := db.FindPosts(ctx, user.Following, p.Col)
 	if httpErr != nil {
 		return c.JSON(httpErr.Code, httpErr.Message)
 	}
@@ -100,20 +102,16 @@ func (p *PostsHandler) PostUpdate(c echo.Context) error {
 
 // Handle validation and parsing request data for comments creation
 func (p *PostsHandler) CommentPost(c echo.Context) error {
-	id, err := primitive.ObjectIDFromHex(userIDFromToken(c))
-	if err != nil {
-		return c.JSON(500, "Unable to convert to object id")
-	}
-
+	id := userIDFromToken(c)
 	c.Echo().Validator = &CommentValidator{validator: v}
 	var comment models.Comment
-	comment.From = id.Hex()
+	comment.From = id
 
-	if err = c.Bind(&comment); err != nil {
+	if err := c.Bind(&comment); err != nil {
 		return c.JSON(422, "Unable to parse request body")
 	}
 
-	if err = c.Validate(&comment); err != nil {
+	if err := c.Validate(&comment); err != nil {
 		return c.JSON(400, "Invalid request body")
 	}
 

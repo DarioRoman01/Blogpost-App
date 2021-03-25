@@ -64,7 +64,7 @@ func DeletePost(ctx context.Context, id string, collection CollectionAPI) (*mong
 		return nil, echo.NewHTTPError(400, "Unable to convert to object id")
 	}
 
-	result, err := collection.DeleteOne(context.Background(), bson.M{"_id": docID})
+	result, err := collection.DeleteOne(ctx, bson.M{"_id": docID})
 	if err != nil {
 		return nil, echo.NewHTTPError(500, "unable to delete post")
 	}

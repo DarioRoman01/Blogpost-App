@@ -55,7 +55,7 @@ func (u *UsersHandler) Login(c echo.Context) error {
 	}
 
 	c.Response().Header().Add("x-auth-token", "Bearer "+token)
-	return c.JSON(200, models.User{Username: logUser.Username})
+	return c.JSON(200, user.Username)
 }
 
 // Handle retrieve user info. Only return the email

@@ -1,4 +1,4 @@
-# Contacts
+# Blogpost-app
 a sample REST API for a blogpost application using Golang with Echo framework
 and MongoDB to store the data.
 
@@ -32,7 +32,7 @@ $ docker-compose build .
 
 $ docker-compose up
 ```
-**The app runs in the port :1323 and Mongo in the port :27017 so make sure you have that ports available or change the value in the files.**
+**The app runs in the port :1323 and Mongo in the port :27017 so make sure you have that ports available or change the value in the docker files.**
 
 
 
