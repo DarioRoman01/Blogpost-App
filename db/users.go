@@ -89,7 +89,11 @@ func RetrieveUser(ctx context.Context, id string, collection CollectionAPI) (mod
 }
 
 // Manage the following system in the db fromID(requesting user) toID(users that requesting user want to follow)
+// also check if the requesting user already follows userTo and perform follow or unfollow
 func SetFollowUser(ctx context.Context, fromID string, toID string, collection CollectionAPI) *echo.HTTPError {
+	var userFrom models.User
+	var userTo models.User
+
 	fromDocID, err := primitive.ObjectIDFromHex(fromID)
 	if err != nil {
 		return echo.NewHTTPError(500, "Unable to convert to object id")
@@ -100,18 +104,39 @@ func SetFollowUser(ctx context.Context, fromID string, toID string, collection C
 		return echo.NewHTTPError(500, "Unable to convert to object id")
 	}
 
-	res, err := collection.UpdateOne(ctx, bson.M{"_id": toDocID}, bson.M{"$addToSet": bson.M{"followers": fromDocID}})
-	if err != nil {
-		return echo.NewHTTPError(500, "Unable to update user")
+	result := collection.FindOne(ctx, bson.M{"_id": fromDocID})
+	if err = result.Decode(&userFrom); err != nil {
+		return echo.NewHTTPError(500, "Unable to decode retrieved user")
 	}
 
-	if res.MatchedCount == 0 {
-		return echo.NewHTTPError(400, "User id does not exist")
+	result = collection.FindOne(ctx, bson.M{"_id": toDocID})
+	if err = result.Decode(&userTo); err != nil {
+		return echo.NewHTTPError(500, "Unable to decode retrieved user")
 	}
 
-	_, err = collection.UpdateOne(ctx, bson.M{"_id": fromDocID}, bson.M{"$addToSet": bson.M{"following": toDocID}})
-	if err != nil {
-		return echo.NewHTTPError(500, "Unable to update user")
+	if !contains(userTo.Followers, fromID) {
+		userFrom.Following = append(userFrom.Following, toID)
+		userTo.Followers = append(userTo.Followers, fromID)
+
+		_, err := collection.UpdateOne(ctx, bson.M{"_id": fromDocID}, bson.M{"$set": userFrom})
+		if err != nil {
+			return echo.NewHTTPError(500, "Unable to update user info")
+		}
+
+		_, err = collection.UpdateOne(ctx, bson.M{"_id": toDocID}, bson.M{"$set": userTo})
+		if err != nil {
+			return echo.NewHTTPError(500, "Unable to update user data")
+		}
+	} else {
+		_, err = collection.UpdateOne(ctx, bson.M{"_id": toDocID}, bson.M{"$pull": bson.M{"followers": fromDocID}})
+		if err != nil {
+			return echo.NewHTTPError(500, "Unable to update user")
+		}
+
+		_, err = collection.UpdateOne(ctx, bson.M{"_id": fromDocID}, bson.M{"$pull:": bson.M{"following": toDocID}})
+		if err != nil {
+			return echo.NewHTTPError(500, "Unable to update user")
+		}
 	}
 
 	return nil

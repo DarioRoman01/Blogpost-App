@@ -135,3 +135,15 @@ func (p *PostsHandler) DeleteComment(c echo.Context) error {
 
 	return c.JSON(200, post)
 }
+
+func (p *PostsHandler) ToggleLikePost(c echo.Context) error {
+	postID := c.Param("id")
+	userID := userIDFromToken(c)
+
+	httpErr := db.SetLike(context.Background(), userID, postID, p.Col)
+	if httpErr != nil {
+		return c.JSON(httpErr.Code, httpErr.Message)
+	}
+
+	return c.JSON(200, "request was successfully")
+}

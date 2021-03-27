@@ -46,6 +46,7 @@ func main() {
 	e.PATCH("/posts/:id", ph.PostUpdate, middlewares.IsPostOwner)
 	e.POST("/posts/:id/comment", ph.CommentPost)
 	e.DELETE("/posts/:id/comment/:cid", ph.DeleteComment, middlewares.IsCommentOwner)
+	e.POST("/posts/:id/like", ph.ToggleLikePost)
 
 	// users endpoints
 	e.POST("/users/signup", uh.Signup)

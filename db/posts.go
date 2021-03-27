@@ -117,3 +117,61 @@ func RetrievetUserPosts(ctx context.Context, id string, collection CollectionAPI
 
 	return posts, nil
 }
+
+// check if requesting user already like the post and remove or add the like to the post
+func SetLike(ctx context.Context, userID, postID string, collection CollectionAPI) *echo.HTTPError {
+	var post models.Post
+
+	docID, err := primitive.ObjectIDFromHex(postID)
+	if err != nil {
+		return echo.NewHTTPError(500, "Unable to convert to object id")
+	}
+
+	result := collection.FindOne(ctx, bson.M{"_id": docID})
+	if result.Err() != nil {
+		return echo.NewHTTPError(400, "Post does not exist")
+	}
+
+	if err = result.Decode(&post); err != nil {
+		return echo.NewHTTPError(500, "uanble to decode retrieved post")
+	}
+
+	if !contains(post.LikedBy, userID) {
+		post.LikedBy = append(post.LikedBy, userID)
+		post.Likes++
+
+		_, err = collection.UpdateOne(ctx, bson.M{"_id": docID}, bson.M{"$set": post})
+		if err != nil {
+			return echo.NewHTTPError(500, "Unable to update post")
+		}
+	} else {
+		index := GetIndex(post.LikedBy, userID)
+		post.LikedBy = append(post.LikedBy[:index], post.LikedBy[index+1:]...)
+		post.Likes--
+		_, err = collection.UpdateOne(ctx, bson.M{"_id": docID}, bson.M{"$set": post})
+		if err != nil {
+			return echo.NewHTTPError(500, "Unable to update post")
+		}
+	}
+
+	return nil
+}
+
+func contains(s []string, str string) bool {
+	for _, v := range s {
+		if v == str {
+			return true
+		}
+	}
+
+	return false
+}
+
+func GetIndex(s []string, str string) int {
+	for i, v := range s {
+		if v == str {
+			return i
+		}
+	}
+	return 0
+}
