@@ -23,8 +23,8 @@ way to learn MongoDB than using it in a project.
 
 ## Requirements 
 * Docker and Docker-compose or golang installed on your system
-* If you dont have Docker and want to use it with docker check this link ![Install Docker](https://docs.docker.com/engine/install/)
-* If you dont have go and want to use it with go check this link ![Install Golang](https://golang.org/doc/install)
+* If you dont have Docker and want to use it with docker check this link [Install Docker](https://docs.docker.com/engine/install/)
+* If you dont have go and want to use it with go check this link [Install Golang](https://golang.org/doc/install)
 
 ## Commands for Docker
 ```
