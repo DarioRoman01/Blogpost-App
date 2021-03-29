@@ -22,15 +22,28 @@ way to learn MongoDB than using it in a project.
 # Usage
 
 ## Requirements 
-* Docker and Docker-compose
+* Docker and Docker-compose or golang installed on your system
 
-## Commands
+## Commands for Docker
 ```
 $ export COMPOSE_FILE=docker-compose.yml
 
 $ docker-compose build .
 
 $ docker-compose up
+```
+
+## Commands for Go
+```
+$ go mod download
+
+# No compile
+$ go run main.go
+
+# If you want to compile it
+$ go build -o main.go
+
+$ ./main
 ```
 **The app runs in the port :1323 and Mongo in the port :27017 so make sure you have that ports available or change the value in the docker files.**
 
